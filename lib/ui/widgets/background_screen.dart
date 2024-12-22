@@ -19,7 +19,7 @@ class BackgroundScreen extends StatelessWidget {
           AssetsPath.backgroundSvg,
           fit: BoxFit.cover,
           width: double.maxFinite,
-          height: MediaQuery.of(context).size.height,
+          height: double.maxFinite,
         ),
         SafeArea(child: child)
       ],
