@@ -3,20 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:task_manager/ui/utils/app_colors.dart';
 
 import '../widgets/task_widgets.dart';
-import 'screens.dart';
 
-class SignInScreen extends StatefulWidget {
-  const SignInScreen({super.key});
+class ForgorPasswordEmailVerification extends StatefulWidget {
+  const ForgorPasswordEmailVerification({super.key});
 
-  static const String name = '/SignInScreen';
+  static const String name = '/ForgorPassword/EmailVerification';
 
   @override
-  State<SignInScreen> createState() => _SignInScreenState();
+  State<ForgorPasswordEmailVerification> createState() =>
+      _ForgorPasswordEmailVerificationState();
 }
 
-class _SignInScreenState extends State<SignInScreen> {
+class _ForgorPasswordEmailVerificationState
+    extends State<ForgorPasswordEmailVerification> {
   TextEditingController _gmailTEController = TextEditingController();
-  TextEditingController _passwordTEController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -33,19 +33,18 @@ class _SignInScreenState extends State<SignInScreen> {
               children: [
                 SizedBox(height: 88),
                 Text(
-                  'Get Started with',
+                  'Your Email Address',
                   style: textThem.titleLarge,
+                ),
+                Text(
+                  'A 6 digit verification pin will send to your email address',
+                  style: TextStyle(color: Colors.black38),
                 ),
                 SizedBox(height: 24),
                 TextField(
                   controller: _gmailTEController,
+                  keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(hintText: 'Gmail'),
-                ),
-                SizedBox(height: 8),
-                TextField(
-                  controller: _passwordTEController,
-                  obscureText: true,
-                  decoration: InputDecoration(hintText: 'Password'),
                 ),
                 SizedBox(height: 24),
                 ElevatedButton(
@@ -58,19 +57,8 @@ class _SignInScreenState extends State<SignInScreen> {
                 ),
                 SizedBox(height: 48),
                 Center(
-                  child: Column(
-                    children: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pushNamed(
-                              context, ForgorPasswordEmailVerification.name);
-                        },
-                        child: Text('Forgot Password'),
-                      ),
-                      buildSignUpSection(),
-                    ],
-                  ),
-                ),
+                  child: buildSignUpSection(),
+                )
               ],
             ),
           ),
@@ -82,7 +70,7 @@ class _SignInScreenState extends State<SignInScreen> {
   Widget buildSignUpSection() {
     return RichText(
       text: TextSpan(
-        text: "Don't have an Acount? ",
+        text: "Have account? ",
         style: TextStyle(
           color: Colors.black87,
           fontWeight: FontWeight.w600,
@@ -96,7 +84,7 @@ class _SignInScreenState extends State<SignInScreen> {
             ),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
-                Navigator.pushNamed(context, SignUpScreen.name);
+                Navigator.pop(context);
               },
           )
         ],

@@ -3,19 +3,21 @@ import 'package:flutter/material.dart';
 import 'package:task_manager/ui/utils/app_colors.dart';
 
 import '../widgets/task_widgets.dart';
-import 'screens.dart';
 
-class SignInScreen extends StatefulWidget {
-  const SignInScreen({super.key});
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
 
-  static const String name = '/SignInScreen';
+  static const String name = '/SignUpScreen';
 
   @override
-  State<SignInScreen> createState() => _SignInScreenState();
+  State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _SignInScreenState extends State<SignInScreen> {
+class _SignUpScreenState extends State<SignUpScreen> {
   TextEditingController _gmailTEController = TextEditingController();
+  TextEditingController _firstNameTEController = TextEditingController();
+  TextEditingController _lastNameTEController = TextEditingController();
+  TextEditingController _mobileTEController = TextEditingController();
   TextEditingController _passwordTEController = TextEditingController();
 
   @override
@@ -33,13 +35,30 @@ class _SignInScreenState extends State<SignInScreen> {
               children: [
                 SizedBox(height: 88),
                 Text(
-                  'Get Started with',
+                  'Join With Us',
                   style: textThem.titleLarge,
                 ),
                 SizedBox(height: 24),
                 TextField(
                   controller: _gmailTEController,
+                  keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(hintText: 'Gmail'),
+                ),
+                SizedBox(height: 8),
+                TextField(
+                  controller: _firstNameTEController,
+                  decoration: InputDecoration(hintText: 'First Name'),
+                ),
+                SizedBox(height: 8),
+                TextField(
+                  controller: _lastNameTEController,
+                  decoration: InputDecoration(hintText: 'Last Name'),
+                ),
+                SizedBox(height: 8),
+                TextField(
+                  controller: _mobileTEController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(hintText: 'Mobile'),
                 ),
                 SizedBox(height: 8),
                 TextField(
@@ -58,19 +77,8 @@ class _SignInScreenState extends State<SignInScreen> {
                 ),
                 SizedBox(height: 48),
                 Center(
-                  child: Column(
-                    children: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pushNamed(
-                              context, ForgorPasswordEmailVerification.name);
-                        },
-                        child: Text('Forgot Password'),
-                      ),
-                      buildSignUpSection(),
-                    ],
-                  ),
-                ),
+                  child: buildSignUpSection(),
+                )
               ],
             ),
           ),
@@ -82,7 +90,7 @@ class _SignInScreenState extends State<SignInScreen> {
   Widget buildSignUpSection() {
     return RichText(
       text: TextSpan(
-        text: "Don't have an Acount? ",
+        text: "Have account? ",
         style: TextStyle(
           color: Colors.black87,
           fontWeight: FontWeight.w600,
@@ -96,7 +104,7 @@ class _SignInScreenState extends State<SignInScreen> {
             ),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
-                Navigator.pushNamed(context, SignUpScreen.name);
+                Navigator.pop(context);
               },
           )
         ],
