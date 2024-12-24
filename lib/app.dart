@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:task_manager/ui/screens/forgot_password_otp_verification.dart';
 import 'package:task_manager/ui/screens/screens.dart';
 import 'package:task_manager/ui/utils/app_colors.dart';
 
@@ -12,8 +13,25 @@ class TaskManagerApp extends StatelessWidget {
       theme: ThemeData(
         colorSchemeSeed: AppColors.themColor,
         textTheme: TextTheme(
-          titleLarge: TextStyle(
-            fontSize: 32,
+          headlineMedium: TextStyle(
+            fontSize: 28,
+            fontFamily: 'poppins',
+            fontWeight: FontWeight.w600,
+            color: Color(0xff2e374f),
+          ),
+          bodyMedium: TextStyle(
+            fontFamily: 'roboto',
+            color: Color(0xff989898),
+          ),
+          labelSmall: TextStyle(
+            fontSize: 11,
+            fontFamily: 'poppins',
+            fontWeight: FontWeight.w400,
+            color: Color(0xff5f5f5f),
+          ),
+          labelLarge: TextStyle(
+            fontSize: 13,
+            fontFamily: 'poppins',
             fontWeight: FontWeight.w600,
             color: Color(0xff2e374f),
           ),
@@ -34,8 +52,10 @@ class TaskManagerApp extends StatelessWidget {
           filled: true,
           fillColor: Colors.white,
           hintStyle: TextStyle(
+            fontSize: 11,
+            fontFamily: 'roboto',
+            fontWeight: FontWeight.w300,
             color: Color(0xffc0c0c0),
-            fontWeight: FontWeight.w400,
           ),
           border: OutlineInputBorder(
             borderSide: BorderSide.none,
@@ -62,6 +82,8 @@ class TaskManagerApp extends StatelessWidget {
           widget = const SignUpScreen();
         } else if (settings.name == ForgorPasswordEmailVerification.name) {
           widget = const ForgorPasswordEmailVerification();
+        } else if (settings.name == ForgorPasswordOtpVerification.name) {
+          widget = const ForgorPasswordOtpVerification();
         }
         return MaterialPageRoute(
           builder: (context) => widget,

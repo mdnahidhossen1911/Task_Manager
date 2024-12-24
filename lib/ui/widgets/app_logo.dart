@@ -12,7 +12,7 @@ class AppLogo extends StatelessWidget {
   Widget build(BuildContext context) {
     return SvgPicture.asset(
       AssetsPath.logoSvg,
-      width: 135,
+      width: 124,
     );
   }
 }

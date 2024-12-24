@@ -27,14 +27,14 @@ class _SignInScreenState extends State<SignInScreen> {
       body: BackgroundScreen(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.all(30),
+            padding: const EdgeInsets.all(32),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(height: 88),
+                SizedBox(height: 128),
                 Text(
                   'Get Started with',
-                  style: textThem.titleLarge,
+                  style: textThem.headlineMedium,
                 ),
                 SizedBox(height: 24),
                 TextField(
@@ -63,9 +63,14 @@ class _SignInScreenState extends State<SignInScreen> {
                       TextButton(
                         onPressed: () {
                           Navigator.pushNamed(
-                              context, ForgorPasswordEmailVerification.name);
+                            context,
+                            ForgorPasswordEmailVerification.name,
+                          );
                         },
-                        child: Text('Forgot Password'),
+                        child: Text(
+                          'Forgot Password?',
+                          style: textThem.labelSmall,
+                        ),
                       ),
                       buildSignUpSection(),
                     ],
@@ -80,18 +85,18 @@ class _SignInScreenState extends State<SignInScreen> {
   }
 
   Widget buildSignUpSection() {
+    final textThem = Theme.of(context).textTheme;
+
     return RichText(
       text: TextSpan(
         text: "Don't have an Acount? ",
-        style: TextStyle(
-          color: Colors.black87,
-          fontWeight: FontWeight.w600,
-        ),
+        style: textThem.labelLarge,
         children: [
           TextSpan(
             text: "Sign up",
             style: TextStyle(
               color: AppColors.themColor,
+              fontFamily: 'poppins',
               fontWeight: FontWeight.w600,
             ),
             recognizer: TapGestureRecognizer()

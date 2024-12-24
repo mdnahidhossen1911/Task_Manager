@@ -36,7 +36,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 SizedBox(height: 88),
                 Text(
                   'Join With Us',
-                  style: textThem.titleLarge,
+                  style: textThem.headlineMedium,
                 ),
                 SizedBox(height: 24),
                 TextField(
@@ -88,18 +88,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   Widget buildSignUpSection() {
+    final textThem = Theme.of(context).textTheme;
+
     return RichText(
       text: TextSpan(
         text: "Have account? ",
-        style: TextStyle(
-          color: Colors.black87,
-          fontWeight: FontWeight.w600,
-        ),
+        style: textThem.labelLarge,
         children: [
           TextSpan(
             text: "Sign up",
             style: TextStyle(
               color: AppColors.themColor,
+              fontFamily: 'poppins',
               fontWeight: FontWeight.w600,
             ),
             recognizer: TapGestureRecognizer()
