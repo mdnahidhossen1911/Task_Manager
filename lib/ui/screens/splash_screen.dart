@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:task_manager/ui/screens/screens.dart';
+import 'package:task_manager/ui/screens/core/screens.dart';
 
 import '../widgets/task_widgets.dart';
 

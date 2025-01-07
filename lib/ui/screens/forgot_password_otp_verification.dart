@@ -1,7 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
-import 'package:task_manager/ui/screens/screens.dart';
+import 'package:task_manager/ui/screens/core/screens.dart';
 import 'package:task_manager/ui/utils/app_colors.dart';
 
 import '../widgets/task_widgets.dart';
@@ -76,8 +76,11 @@ class _ForgorPasswordOtpVerificationState
         fieldHeight: 50,
         fieldWidth: 50,
         activeFillColor: Colors.white,
-        selectedFillColor: Colors.white,
+        selectedFillColor: AppColors.themColor,
         inactiveFillColor: Colors.white,
+        activeColor: AppColors.themColor,
+        selectedColor: AppColors.themColor,
+        inactiveColor: Colors.white,
       ),
       animationDuration: const Duration(milliseconds: 300),
       backgroundColor: Colors.transparent,

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:task_manager/ui/utils/app_colors.dart';
 
 import '../widgets/task_widgets.dart';
-import 'screens.dart';
+import 'core/screens.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -54,7 +54,10 @@ class _SignInScreenState extends State<SignInScreen> {
                     color: Colors.white,
                     size: 24,
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(
+                        context, MainBottomNavScreen.name);
+                  },
                 ),
                 SizedBox(height: 48),
                 Center(
