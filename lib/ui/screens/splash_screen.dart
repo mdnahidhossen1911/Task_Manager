@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:task_manager/ui/screens/core/screens.dart';
+import 'package:task_manager/ui/screens/sign_in_screen.dart';
 
+import '../controller/auth_controller.dart';
 import '../widgets/task_widgets.dart';
+import 'main_bottom_nav_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -17,16 +19,18 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    getNextScreen();
+    moveToNextScreen();
   }
 
-  Future<void> getNextScreen() {
-    return Future.delayed(
-      const Duration(seconds: 3),
-      () {
-        Navigator.pushReplacementNamed(context, SignInScreen.name);
-      },
-    );
+  Future<void> moveToNextScreen() async {
+    await Future.delayed(const Duration(seconds: 2));
+    bool isUserLoggedIn = await AuthController.isUserLoggedIn();
+    if (isUserLoggedIn) {
+      Navigator.pushReplacementNamed(context, MainBottomNavScreen.name);
+      print(AuthController.userModel!.firstName);
+    } else {
+      Navigator.pushReplacementNamed(context, SignInScreen.name);
+    }
   }
 
   @override

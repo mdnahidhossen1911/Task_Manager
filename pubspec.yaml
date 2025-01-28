@@ -18,6 +18,8 @@ dependencies:
   cupertino_icons: ^1.0.8
   flutter_svg: ^2.0.16
   pin_code_fields: ^8.0.1
+  shared_preferences: ^2.3.5
+  image_picker: ^1.1.2
 
 
 

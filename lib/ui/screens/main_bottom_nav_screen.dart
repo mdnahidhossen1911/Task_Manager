@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:task_manager/ui/screens/progress_task_list_screen.dart';
 import 'package:task_manager/ui/utils/app_colors.dart';
 
-import 'core/screens.dart';
+import 'canceled_task_list_screen.dart';
+import 'completed_task_list_screen.dart';
+import 'new_task_list_screen.dart';
 
 class MainBottomNavScreen extends StatefulWidget {
   const MainBottomNavScreen({super.key});
@@ -37,11 +40,10 @@ class _MainBottomNavScreenState extends State<MainBottomNavScreen> {
         },
         items: [
           BottomNavigationBarItem(
-              icon: Icon(Icons.dashboard), label: 'New Task'),
+              icon: Icon(Icons.new_label), label: 'New Task'),
           BottomNavigationBarItem(
               icon: Icon(Icons.sticky_note_2), label: 'Completed'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.cancel_outlined), label: 'Canceled'),
+          BottomNavigationBarItem(icon: Icon(Icons.cancel), label: 'Canceled'),
           BottomNavigationBarItem(
               icon: Icon(Icons.incomplete_circle), label: 'Progress'),
         ],
