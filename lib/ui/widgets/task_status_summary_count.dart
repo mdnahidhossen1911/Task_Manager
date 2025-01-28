@@ -7,7 +7,7 @@ class TaskStatusSummaryCount extends StatelessWidget {
     required this.title,
   });
 
-  final int count;
+  final String count;
   final String title;
 
   @override
@@ -15,14 +15,15 @@ class TaskStatusSummaryCount extends StatelessWidget {
     final textThem = Theme.of(context).textTheme;
 
     return Card(
-      margin: EdgeInsets.all(4),
+      margin: EdgeInsets.symmetric(horizontal: 5, vertical: 4),
       color: Colors.white,
       elevation: 1,
       shadowColor: Colors.black38,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+        padding: const EdgeInsets.only(left: 24, right: 36),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
               '${count ?? '0'}',

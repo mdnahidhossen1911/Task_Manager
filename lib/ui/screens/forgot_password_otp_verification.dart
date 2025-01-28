@@ -1,13 +1,21 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
-import 'package:task_manager/ui/screens/core/screens.dart';
+import 'package:task_manager/data/services/network_caller.dart';
+import 'package:task_manager/data/utils/urls.dart';
+import 'package:task_manager/ui/screens/recovary_password_screen.dart';
+import 'package:task_manager/ui/screens/sign_in_screen.dart';
 import 'package:task_manager/ui/utils/app_colors.dart';
+import 'package:task_manager/ui/widgets/snack_bar_massage.dart';
 
 import '../widgets/task_widgets.dart';
 
 class ForgorPasswordOtpVerification extends StatefulWidget {
-  const ForgorPasswordOtpVerification({super.key});
+  final String gmail;
+  const ForgorPasswordOtpVerification({
+    super.key,
+    required this.gmail,
+  });
 
   static const String name = '/Forgor-Password/OTP-Verification';
 
@@ -18,7 +26,10 @@ class ForgorPasswordOtpVerification extends StatefulWidget {
 
 class _ForgorPasswordOtpVerificationState
     extends State<ForgorPasswordOtpVerification> {
-  TextEditingController _otpTEController = TextEditingController();
+  final TextEditingController _otpTEController = TextEditingController();
+
+  bool _inProgress = true;
+  int otpLenth = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -46,12 +57,16 @@ class _ForgorPasswordOtpVerificationState
                 _buildPinCodeTextField(),
                 SizedBox(height: 24),
                 ElevatedButton(
-                  child: Icon(
-                    Icons.arrow_circle_right_outlined,
-                    color: Colors.white,
-                    size: 24,
-                  ),
-                  onPressed: () {},
+                  onPressed: _inProgress == true ? _otpVerifyButton : null,
+                  child: _inProgress == true
+                      ? Icon(
+                          Icons.arrow_circle_right_outlined,
+                          color: Colors.white,
+                          size: 24,
+                        )
+                      : CircularProgressIndicator(
+                          color: AppColors.themColor,
+                        ),
                 ),
                 SizedBox(height: 36),
                 Center(
@@ -87,6 +102,9 @@ class _ForgorPasswordOtpVerificationState
       enableActiveFill: true,
       controller: _otpTEController,
       appContext: context,
+      onChanged: (value) {
+        otpLenth = value.length;
+      },
     );
   }
 
@@ -117,5 +135,47 @@ class _ForgorPasswordOtpVerificationState
         ],
       ),
     );
+  }
+
+  void _otpVerifyButton() {
+    if (otpLenth == 6) {
+      _inProgress = false;
+      setState(() {});
+      _otpVerify();
+    }
+  }
+
+  Future<void> _otpVerify() async {
+    final String otp = _otpTEController.text.trim();
+    final String gmail = widget.gmail;
+
+    final Map gmailAndOtp = {'gmail': gmail, 'otp': otp};
+
+    print('$otp $gmail');
+
+    NetworkResponse response =
+        await NetworkCaller.getRequest(url: Urls.otpVerify(gmail, otp));
+    _inProgress = true;
+    if (response.isSuccess) {
+      if (response.responseData!['status'] == "fail") {
+        showSnackBarMessage(context, 'Invalid OTP Code', false);
+        _otpTEController.clear();
+      } else {
+        Navigator.pushReplacementNamed(
+          context,
+          RecovaryPasswordScreen.name,
+          arguments: gmailAndOtp,
+        );
+      }
+    } else {
+      showSnackBarMessage(context, response.errorMessage, false);
+    }
+    setState(() {});
+  }
+
+  @override
+  void dispose() {
+    _otpTEController.dispose();
+    super.dispose();
   }
 }
