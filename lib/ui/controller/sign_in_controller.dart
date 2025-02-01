@@ -22,6 +22,8 @@ class SignInController extends GetxController {
       "password": pass,
     };
 
+    NetworkCaller.isSignInScreen = true;
+
     NetworkResponse response = await NetworkCaller.postRequest(
       url: Urls.loginUrl,
       body: requestBody,

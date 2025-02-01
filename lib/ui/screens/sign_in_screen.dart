@@ -4,8 +4,8 @@ import 'package:get/get.dart';
 import 'package:task_manager/ui/controller/sign_in_controller.dart';
 import 'package:task_manager/ui/screens/sign_up_screens.dart';
 import 'package:task_manager/ui/utils/app_colors.dart';
-import 'package:task_manager/ui/widgets/snack_bar_massage.dart';
 
+import '../widgets/snack_bar_massage.dart';
 import '../widgets/task_widgets.dart';
 import 'forgor_password_email_verification.dart';
 import 'main_bottom_nav_screen.dart';
@@ -96,10 +96,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       children: [
                         TextButton(
                           onPressed: () {
-                            Navigator.pushNamed(
-                              context,
-                              ForgorPasswordEmailVerification.name,
-                            );
+                            Get.offNamed(ForgorPasswordEmailVerification.name);
                           },
                           child: Text(
                             'Forgot Password?',
@@ -136,7 +133,7 @@ class _SignInScreenState extends State<SignInScreen> {
             ),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
-                Navigator.pushNamed(context, SignUpScreen.name);
+                Get.toNamed(SignUpScreen.name);
               },
           )
         ],
