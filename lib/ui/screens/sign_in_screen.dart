@@ -1,13 +1,11 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:task_manager/ui/controller/sign_in_controller.dart';
 import 'package:task_manager/ui/screens/sign_up_screens.dart';
 import 'package:task_manager/ui/utils/app_colors.dart';
 import 'package:task_manager/ui/widgets/snack_bar_massage.dart';
 
-import '../../data/models/user_model.dart';
-import '../../data/services/network_caller.dart';
-import '../../data/utils/urls.dart';
-import '../controller/auth_controller.dart';
 import '../widgets/task_widgets.dart';
 import 'forgor_password_email_verification.dart';
 import 'main_bottom_nav_screen.dart';
@@ -25,7 +23,8 @@ class _SignInScreenState extends State<SignInScreen> {
   final TextEditingController _gmailTEController = TextEditingController();
   final TextEditingController _passwordTEController = TextEditingController();
   final GlobalKey<FormState> _SignInFormKey = GlobalKey<FormState>();
-  bool signInProgress = true;
+
+  final SignInController _signInController = Get.find<SignInController>();
 
   @override
   Widget build(BuildContext context) {
@@ -75,18 +74,21 @@ class _SignInScreenState extends State<SignInScreen> {
                     },
                   ),
                   SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed:
-                        signInProgress == true ? _ontabSignINButton : null,
-                    child: signInProgress == true
-                        ? Icon(
-                            Icons.arrow_circle_right_outlined,
-                            color: Colors.white,
-                            size: 24,
-                          )
-                        : CircularProgressIndicator(
-                            color: AppColors.themColor,
-                          ),
+                  GetBuilder<SignInController>(
+                    builder: (controller) => ElevatedButton(
+                      onPressed: controller.inProgress == true
+                          ? _ontabSignINButton
+                          : null,
+                      child: controller.inProgress == true
+                          ? Icon(
+                              Icons.arrow_circle_right_outlined,
+                              color: Colors.white,
+                              size: 24,
+                            )
+                          : CircularProgressIndicator(
+                              color: AppColors.themColor,
+                            ),
+                    ),
                   ),
                   SizedBox(height: 48),
                   Center(
@@ -144,36 +146,18 @@ class _SignInScreenState extends State<SignInScreen> {
 
   void _ontabSignINButton() {
     if (_SignInFormKey.currentState!.validate()) {
-      signInProgress = false;
-      setState(() {});
       _signIn();
     }
   }
 
   Future<void> _signIn() async {
-    Map<String, dynamic> requestBody = {
-      "email": _gmailTEController.text.trim(),
-      "password": _passwordTEController.text,
-    };
+    bool isSucess = await _signInController.signIn(
+        _gmailTEController.text.trim(), _passwordTEController.text);
 
-    NetworkResponse response = await NetworkCaller.postRequest(
-      url: Urls.loginUrl,
-      body: requestBody,
-    );
-    signInProgress = true;
-    setState(() {});
-    if (response.isSuccess) {
-      String token = response.responseData!['token'];
-      UserModel userModel = UserModel.fromJson(response.responseData!['data']);
-      await AuthController.saveUserData(token, userModel);
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        MainBottomNavScreen.name,
-        (route) => false,
-      );
+    if (isSucess) {
+      Get.offAndToNamed(MainBottomNavScreen.name);
     } else {
-      showSnackBarMessage(
-          context, 'Email/Password is invalid! Try again.', false);
+      showSnackBarMessage(context, _signInController.errorMessage!, false);
     }
   }
 }
