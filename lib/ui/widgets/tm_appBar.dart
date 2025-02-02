@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../controller/auth_controller.dart';
 import '../screens/sign_in_screen.dart';
@@ -19,47 +20,50 @@ class TMAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       backgroundColor: AppColors.themColor,
-      title: Row(
-        children: [
-          CircleAvatar(
-            radius: 18,
-            backgroundImage: MemoryImage(
-              base64Decode(AuthController.userModel?.photo ?? ''),
+      title: GetBuilder<AuthController>(builder: (controller) {
+        return Row(
+          children: [
+            CircleAvatar(
+              radius: 18,
+              backgroundImage: MemoryImage(
+                base64Decode(controller.profileImage ?? ''),
+              ),
+              onBackgroundImageError: (_, __) =>
+                  const Icon(Icons.person_outline),
             ),
-            onBackgroundImageError: (_, __) => const Icon(Icons.person_outline),
-          ),
-          SizedBox(width: 12),
-          GestureDetector(
-            onTap: () {
-              if (!fromUpdateProfile) {
-                Navigator.pushNamed(context, UpdateProfileScreen.name);
-              }
-            },
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  AuthController.userModel?.fullName ?? '',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.white,
-                    fontFamily: 'poppins',
-                    fontWeight: FontWeight.w600,
+            SizedBox(width: 12),
+            GestureDetector(
+              onTap: () {
+                if (!fromUpdateProfile) {
+                  Get.toNamed(UpdateProfileScreen.name);
+                }
+              },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    controller.fullName ?? '',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.white,
+                      fontFamily: 'poppins',
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
-                Text(
-                  AuthController.userModel?.email ?? '',
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: Colors.white,
-                    fontFamily: 'poppins',
+                  Text(
+                    controller.gmail! ?? '',
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: Colors.white,
+                      fontFamily: 'poppins',
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        );
+      }),
       actions: [
         PopupMenuButton(
           iconColor: Colors.white,

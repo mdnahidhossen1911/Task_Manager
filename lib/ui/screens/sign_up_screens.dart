@@ -29,8 +29,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   final SignUpController _signUpController = Get.find<SignUpController>();
 
-  bool signUpInProgress = true;
-
   @override
   Widget build(BuildContext context) {
     final textThem = Theme.of(context).textTheme;
@@ -170,8 +168,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   void _ontabSignupButton() {
     if (_formKey.currentState!.validate()) {
-      signUpInProgress = false;
-      setState(() {});
       _registation();
     }
   }
