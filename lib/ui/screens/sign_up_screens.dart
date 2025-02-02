@@ -1,12 +1,11 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:task_manager/data/services/network_caller.dart';
-import 'package:task_manager/data/utils/urls.dart';
+import 'package:get/get.dart';
+import 'package:task_manager/ui/controller/sign_in_controller.dart';
+import 'package:task_manager/ui/controller/sign_up_controller.dart';
 import 'package:task_manager/ui/utils/app_colors.dart';
 import 'package:task_manager/ui/widgets/snack_bar_massage.dart';
 
-import '../../data/models/user_model.dart';
-import '../controller/auth_controller.dart';
 import '../widgets/task_widgets.dart';
 import 'main_bottom_nav_screen.dart';
 
@@ -27,6 +26,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _passwordTEController = TextEditingController();
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  final SignUpController _signUpController = Get.find<SignUpController>();
 
   bool signUpInProgress = true;
 
@@ -114,19 +115,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     },
                   ),
                   SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed:
-                        signUpInProgress == true ? _ontabSignupButton : null,
-                    child: signUpInProgress == true
-                        ? Icon(
-                            Icons.arrow_circle_right_outlined,
-                            color: Colors.white,
-                            size: 24,
-                          )
-                        : CircularProgressIndicator(
-                            color: AppColors.themColor,
-                          ),
-                  ),
+                  GetBuilder<SignUpController>(builder: (controller) {
+                    return ElevatedButton(
+                      onPressed: controller.inProgress == true
+                          ? _ontabSignupButton
+                          : null,
+                      child: controller.inProgress == true
+                          ? Icon(
+                              Icons.arrow_circle_right_outlined,
+                              color: Colors.white,
+                              size: 24,
+                            )
+                          : CircularProgressIndicator(
+                              color: AppColors.themColor,
+                            ),
+                    );
+                  }),
                   SizedBox(height: 48),
                   Center(
                     child: buildSignUpSection(),
@@ -156,7 +160,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             ),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
-                Navigator.pop(context);
+                Get.back();
               },
           )
         ],
@@ -181,26 +185,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
       "password": _passwordTEController.text,
       "photo": ""
     };
-    print(requestBody);
 
-    final NetworkResponse response = await NetworkCaller.postRequest(
-        url: Urls.registrationUrl, body: requestBody);
-    signUpInProgress = true;
-    if (response.isSuccess) {
-      String status = response.responseData!['status'];
-      if (status == 'fail') {
+    bool isSucces = await _signUpController.registation(requestBody);
+
+    if (isSucces) {
+      showSnackBarMessage(context, 'Registration successful!', true);
+      Future.delayed(
+        Duration(milliseconds: 500),
+        () => _signIn(),
+      );
+    } else {
+      if (_signUpController.errorMessage ==
+          'Already created an account using this email.') {
         showSnackBarMessage(
             context, 'Already created an account using this email.', false);
         _gmailTEController.clear();
       } else {
-        showSnackBarMessage(context, 'Registation successful!', true);
-        Future.delayed(
-          Duration(milliseconds: 500),
-          () => _signIn(),
-        );
+        showSnackBarMessage(context, _signUpController.errorMessage!, false);
       }
-    } else {
-      showSnackBarMessage(context, response.errorMessage, false);
     }
     setState(() {});
   }
@@ -219,28 +221,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
       },
     );
 
-    Map<String, dynamic> requestBody = {
-      "email": _gmailTEController.text.trim(),
-      "password": _passwordTEController.text,
-    };
+    bool isSucess = await Get.find<SignInController>()
+        .signIn(_gmailTEController.text.trim(), _passwordTEController.text);
 
-    NetworkResponse response = await NetworkCaller.postRequest(
-      url: Urls.loginUrl,
-      body: requestBody,
-    );
-    _clearTextField();
-    if (response.isSuccess) {
-      String token = response.responseData!['token'];
-      UserModel userModel = UserModel.fromJson(response.responseData!['data']);
-      await AuthController.saveUserData(token, userModel);
-      Navigator.pushNamedAndRemoveUntil(
-        context,
+    if (isSucess) {
+      _clearTextField();
+      Get.offNamedUntil(
         MainBottomNavScreen.name,
         (route) => false,
       );
     } else {
-      Navigator.pop(context);
-      Navigator.pop(context);
+      Get.back();
+      Get.back();
     }
   }
 
