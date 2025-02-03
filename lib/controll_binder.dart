@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:task_manager/ui/controller/forgot_password_otp_Controller.dart';
 import 'package:task_manager/ui/controller/recovary_password_controller.dart';
 import 'package:task_manager/ui/controller/sign_in_controller.dart';
+import 'package:task_manager/ui/controller/summary_task_list_controller.dart';
 
 import 'ui/controller/auth_controller.dart';
 import 'ui/controller/forgot_password_gmail_Controller.dart';
@@ -15,6 +16,8 @@ class ControllBinder extends Bindings {
     Get.lazyPut(() => ForgotPasswordGmailController());
     Get.lazyPut(() => ForgotPasswordOtpController());
     Get.lazyPut(() => RecovaryPasswordController());
+
+    Get.put(SummaryTaskListController());
     Get.put(AuthController());
   }
 }
