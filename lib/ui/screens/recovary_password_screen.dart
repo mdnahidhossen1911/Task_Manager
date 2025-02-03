@@ -1,7 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:task_manager/data/services/network_caller.dart';
-import 'package:task_manager/data/utils/urls.dart';
+import 'package:get/get.dart';
+import 'package:task_manager/ui/controller/recovary_password_controller.dart';
 import 'package:task_manager/ui/screens/sign_in_screen.dart';
 import 'package:task_manager/ui/utils/app_colors.dart';
 import 'package:task_manager/ui/widgets/snack_bar_massage.dart';
@@ -26,7 +26,9 @@ class _RecovaryPasswordScreenState extends State<RecovaryPasswordScreen> {
   final TextEditingController _confirmpassTEController =
       TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  bool _inProgress = true;
+
+  RecovaryPasswordController _recovaryPasswordController =
+      Get.find<RecovaryPasswordController>();
 
   @override
   Widget build(BuildContext context) {
@@ -81,14 +83,17 @@ class _RecovaryPasswordScreenState extends State<RecovaryPasswordScreen> {
                         return null;
                       }),
                   SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: _inProgress == true ? _setPassButton : null,
-                    child: _inProgress == true
-                        ? Text('Confirm')
-                        : CircularProgressIndicator(
-                            color: AppColors.themColor,
-                          ),
-                  ),
+                  GetBuilder<RecovaryPasswordController>(builder: (controller) {
+                    return ElevatedButton(
+                      onPressed:
+                          controller.inProgress == true ? _setPassButton : null,
+                      child: controller.inProgress == true
+                          ? Text('Confirm')
+                          : CircularProgressIndicator(
+                              color: AppColors.themColor,
+                            ),
+                    );
+                  }),
                   SizedBox(height: 48),
                   Center(
                     child: buildSignUpSection(),
@@ -119,7 +124,7 @@ class _RecovaryPasswordScreenState extends State<RecovaryPasswordScreen> {
             ),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
-                Navigator.pop(context);
+                Get.back();
               },
           )
         ],
@@ -130,35 +135,33 @@ class _RecovaryPasswordScreenState extends State<RecovaryPasswordScreen> {
   void _setPassButton() {
     if (_formKey.currentState!.validate()) {
       if (_passTEController.text == _confirmpassTEController.text) {
-        _inProgress = false;
-        setState(() {});
         recovaryPassword();
       } else {
         showSnackBarMessage(context, "No Match Password", false);
-        _passTEController.clear();
-        _confirmpassTEController.clear();
       }
     }
   }
 
   Future<void> recovaryPassword() async {
-    Map<String, dynamic> recponseBody = {
-      "email": widget.emailAndOtp['gmail'],
-      "OTP": widget.emailAndOtp['otp'],
-      "password": _confirmpassTEController.text
-    };
-    NetworkResponse response = await NetworkCaller.postRequest(
-        url: Urls.recoverResetPass, body: recponseBody);
-    if (response.isSuccess) {
+    bool isSuccess = await _recovaryPasswordController.recovaryPass(
+      widget.emailAndOtp['gmail'],
+      widget.emailAndOtp['otp'],
+      _confirmpassTEController.text,
+    );
+
+    if (isSuccess) {
       showSnackBarMessage(context, "Password recovary success", true);
-      Future.delayed(Duration(seconds: 1));
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        SignInScreen.name,
-        (route) => false,
+      Future.delayed(
+        Duration(seconds: 1),
+        () {
+          Get.offAllNamed(SignInScreen.name);
+        },
       );
+      _passTEController.clear();
+      _confirmpassTEController.clear();
     } else {
-      showSnackBarMessage(context, response.errorMessage, false);
+      showSnackBarMessage(
+          context, _recovaryPasswordController.errorMessage, false);
     }
   }
 
