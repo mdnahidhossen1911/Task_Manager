@@ -1,10 +1,9 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
-import 'package:task_manager/data/services/network_caller.dart';
-import 'package:task_manager/data/utils/urls.dart';
+import 'package:task_manager/ui/controller/forgot_password_otp_Controller.dart';
 import 'package:task_manager/ui/screens/recovary_password_screen.dart';
-import 'package:task_manager/ui/screens/sign_in_screen.dart';
 import 'package:task_manager/ui/utils/app_colors.dart';
 import 'package:task_manager/ui/widgets/snack_bar_massage.dart';
 
@@ -28,7 +27,8 @@ class _ForgorPasswordOtpVerificationState
     extends State<ForgorPasswordOtpVerification> {
   final TextEditingController _otpTEController = TextEditingController();
 
-  bool _inProgress = true;
+  final ForgotPasswordOtpController _forgotPasswordOtpController =
+      Get.find<ForgotPasswordOtpController>();
   int otpLenth = 0;
 
   @override
@@ -56,18 +56,21 @@ class _ForgorPasswordOtpVerificationState
                 SizedBox(height: 24),
                 _buildPinCodeTextField(),
                 SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: _inProgress == true ? _otpVerifyButton : null,
-                  child: _inProgress == true
-                      ? Icon(
-                          Icons.arrow_circle_right_outlined,
-                          color: Colors.white,
-                          size: 24,
-                        )
-                      : CircularProgressIndicator(
-                          color: AppColors.themColor,
-                        ),
-                ),
+                GetBuilder<ForgotPasswordOtpController>(builder: (controller) {
+                  return ElevatedButton(
+                    onPressed:
+                        controller.inProgress == true ? _otpVerifyButton : null,
+                    child: controller.inProgress == true
+                        ? Icon(
+                            Icons.arrow_circle_right_outlined,
+                            color: Colors.white,
+                            size: 24,
+                          )
+                        : CircularProgressIndicator(
+                            color: AppColors.themColor,
+                          ),
+                  );
+                }),
                 SizedBox(height: 36),
                 Center(
                   child: buildSignUpSection(),
@@ -125,11 +128,7 @@ class _ForgorPasswordOtpVerificationState
             ),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
-                Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  SignInScreen.name,
-                  (route) => false,
-                );
+                Get.back();
               },
           )
         ],
@@ -139,8 +138,6 @@ class _ForgorPasswordOtpVerificationState
 
   void _otpVerifyButton() {
     if (otpLenth == 6) {
-      _inProgress = false;
-      setState(() {});
       _otpVerify();
     }
   }
@@ -150,27 +147,15 @@ class _ForgorPasswordOtpVerificationState
     final String gmail = widget.gmail;
 
     final Map gmailAndOtp = {'gmail': gmail, 'otp': otp};
+    bool isSuccess = await _forgotPasswordOtpController.verifyOtp(gmail, otp);
 
-    print('$otp $gmail');
-
-    NetworkResponse response =
-        await NetworkCaller.getRequest(url: Urls.otpVerify(gmail, otp));
-    _inProgress = true;
-    if (response.isSuccess) {
-      if (response.responseData!['status'] == "fail") {
-        showSnackBarMessage(context, 'Invalid OTP Code', false);
-        _otpTEController.clear();
-      } else {
-        Navigator.pushReplacementNamed(
-          context,
-          RecovaryPasswordScreen.name,
-          arguments: gmailAndOtp,
-        );
-      }
+    if (isSuccess) {
+      Get.offNamed(RecovaryPasswordScreen.name, arguments: gmailAndOtp);
+      _otpTEController.clear();
     } else {
-      showSnackBarMessage(context, response.errorMessage, false);
+      showSnackBarMessage(
+          context, _forgotPasswordOtpController.errorMessage, false);
     }
-    setState(() {});
   }
 
   @override

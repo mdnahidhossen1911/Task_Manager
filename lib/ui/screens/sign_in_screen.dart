@@ -96,7 +96,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       children: [
                         TextButton(
                           onPressed: () {
-                            Get.offNamed(ForgorPasswordEmailVerification.name);
+                            Get.toNamed(ForgorPasswordEmailVerification.name);
                           },
                           child: Text(
                             'Forgot Password?',

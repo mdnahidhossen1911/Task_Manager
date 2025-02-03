@@ -1,7 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:task_manager/data/services/network_caller.dart';
-import 'package:task_manager/data/utils/urls.dart';
+import 'package:get/get.dart';
+import 'package:task_manager/ui/controller/forgot_password_gmail_Controller.dart';
 import 'package:task_manager/ui/utils/app_colors.dart';
 import 'package:task_manager/ui/widgets/snack_bar_massage.dart';
 
@@ -22,7 +22,9 @@ class _ForgorPasswordEmailVerificationState
     extends State<ForgorPasswordEmailVerification> {
   final TextEditingController _gmailTEController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  bool _InProgress = true;
+
+  final ForgotPasswordGmailController _forgotPasswordGmailController =
+      Get.find<ForgotPasswordGmailController>();
 
   @override
   Widget build(BuildContext context) {
@@ -60,18 +62,23 @@ class _ForgorPasswordEmailVerificationState
                         return null;
                       }),
                   SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: _InProgress == true ? _verifygmailButton : null,
-                    child: _InProgress == true
-                        ? Icon(
-                            Icons.arrow_circle_right_outlined,
-                            color: Colors.white,
-                            size: 24,
-                          )
-                        : CircularProgressIndicator(
-                            color: AppColors.themColor,
-                          ),
-                  ),
+                  GetBuilder<ForgotPasswordGmailController>(
+                      builder: (controller) {
+                    return ElevatedButton(
+                      onPressed: controller.inProgress == true
+                          ? _verifygmailButton
+                          : null,
+                      child: controller.inProgress == true
+                          ? Icon(
+                              Icons.arrow_circle_right_outlined,
+                              color: Colors.white,
+                              size: 24,
+                            )
+                          : CircularProgressIndicator(
+                              color: AppColors.themColor,
+                            ),
+                    );
+                  }),
                   SizedBox(height: 48),
                   Center(
                     child: buildSignUpSection(),
@@ -102,7 +109,7 @@ class _ForgorPasswordEmailVerificationState
             ),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
-                Navigator.pop(context);
+                Get.back();
               },
           )
         ],
@@ -112,31 +119,22 @@ class _ForgorPasswordEmailVerificationState
 
   void _verifygmailButton() {
     if (_formKey.currentState!.validate()) {
-      _InProgress = false;
-      setState(() {});
       _verifyGmail();
     }
   }
 
   Future<void> _verifyGmail() async {
-    NetworkResponse response = await NetworkCaller.getRequest(
-        url: Urls.gmailVerify(_gmailTEController.text.trim()));
-    _InProgress = true;
-    if (response.isSuccess) {
-      if (response.responseData!['status'] == 'fail') {
-        showSnackBarMessage(context, "No User Found", false);
-      } else {
-        Navigator.pushReplacementNamed(
-          context,
-          ForgorPasswordOtpVerification.name,
-          arguments: _gmailTEController.text.trim(),
-        );
-      }
-    } else {
-      showSnackBarMessage(context, response.errorMessage, false);
-    }
+    bool isSuccess = await _forgotPasswordGmailController
+        .verifyGmail(_gmailTEController.text.trim());
 
-    setState(() {});
+    if (isSuccess) {
+      Get.offNamed(ForgorPasswordOtpVerification.name,
+          arguments: _gmailTEController.text.trim());
+      _gmailTEController.clear();
+    } else {
+      showSnackBarMessage(
+          context, _forgotPasswordGmailController.errorMessage, false);
+    }
   }
 
   @override
