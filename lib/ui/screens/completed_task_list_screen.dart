@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_instance/get_instance.dart';
+import 'package:get/get_state_manager/src/simple/get_state.dart';
+import 'package:task_manager/ui/controller/complete_task_list_controller.dart';
 
-import '../../data/models/task_list_by_status_model.dart';
 import '../../data/services/network_caller.dart';
 import '../../data/utils/urls.dart';
 import '../widgets/background_screen.dart';
@@ -18,8 +21,8 @@ class CompletedTaskListScreen extends StatefulWidget {
 }
 
 class _CompletedTaskListScreenState extends State<CompletedTaskListScreen> {
-  bool _getCompletedTaskListInProgress = false;
-  TaskListByStatusModel? completedTaskListModel;
+  final CompleteTaskListController _completedTaskListController =
+      Get.find<CompleteTaskListController>();
 
   @override
   void initState() {
@@ -39,60 +42,59 @@ class _CompletedTaskListScreenState extends State<CompletedTaskListScreen> {
   }
 
   Widget _buildCompletedTaskListview() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: Visibility(
-          visible: _getCompletedTaskListInProgress == false,
-          replacement: const CenteredCircularProgressIndicator(),
-          child: _buildTaskListView()),
-    );
+    return GetBuilder<CompleteTaskListController>(builder: (controller) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        child: Visibility(
+            visible: controller.inProgress == false,
+            replacement: const CenteredCircularProgressIndicator(),
+            child: _buildTaskListView()),
+      );
+    });
   }
 
   Widget _buildTaskListView() {
-    return ListView.builder(
-      shrinkWrap: true,
-      primary: false,
-      itemCount: completedTaskListModel?.taskList?.length ?? 0,
-      padding: EdgeInsets.symmetric(vertical: 10),
-      itemBuilder: (context, index) {
-        return TaskItemWidget(
-          ontabDetele: () {
-            _deleteTaskItem(index);
-          },
-          ontabChangeStatus: (status) {
-            print(status);
-            _upgradeStatus(index, status);
-          },
-          taskModel: completedTaskListModel!.taskList![index],
-        );
-      },
-    );
+    return GetBuilder<CompleteTaskListController>(builder: (controller) {
+      return ListView.builder(
+        shrinkWrap: true,
+        primary: false,
+        itemCount: controller.taskListModel?.length ?? 0,
+        padding: EdgeInsets.symmetric(vertical: 10),
+        itemBuilder: (context, index) {
+          return TaskItemWidget(
+            ontabDetele: () {
+              _deleteTaskItem(index);
+            },
+            ontabChangeStatus: (status) {
+              print(status);
+              _upgradeStatus(index, status);
+            },
+            taskModel: controller.taskListModel![index],
+          );
+        },
+      );
+    });
   }
 
   Future<void> _getCompletedTaskList() async {
-    _getCompletedTaskListInProgress = true;
-    setState(() {});
-    final NetworkResponse response = await NetworkCaller.getRequest(
-        url: Urls.taskListByStatusUrl('Complete'));
-    if (response.isSuccess) {
-      completedTaskListModel =
-          TaskListByStatusModel.fromJson(response.responseData!);
-    } else {
-      showSnackBarMessage(context, response.errorMessage, false);
+    bool isSuccess = await _completedTaskListController.getList();
+
+    if (isSuccess == false) {
+      showSnackBarMessage(
+          context, _completedTaskListController.errormassege, false);
     }
-    _getCompletedTaskListInProgress = false;
-    setState(() {});
   }
 
   Future<void> _deleteTaskItem(int index) async {
-    final String? _taskId = completedTaskListModel!.taskList![index].sId;
+    final String? _taskId =
+        _completedTaskListController.taskListModel![index].sId;
     showSnackBarMessage(context, "Deleting....", true);
 
     NetworkResponse response =
         await NetworkCaller.getRequest(url: Urls.deleteTask(_taskId!));
     if (response.isSuccess) {
       showSnackBarMessage(context, "Task Deleted", true);
-      completedTaskListModel?.taskList?.removeAt(index);
+      _completedTaskListController.taskListModel?.removeAt(index);
       setState(() {});
     } else {
       showSnackBarMessage(context, response.errorMessage, false);
@@ -104,13 +106,14 @@ class _CompletedTaskListScreenState extends State<CompletedTaskListScreen> {
       showSnackBarMessage(context, "You are in 'Complete status'.", false);
     } else {
       showSnackBarMessage(context, "status updating.....", true);
-      final String? _taskId = completedTaskListModel!.taskList![index].sId;
+      final String? _taskId =
+          _completedTaskListController.taskListModel?[index].sId;
 
       NetworkResponse response = await NetworkCaller.getRequest(
           url: Urls.UpgradeTask(_taskId!, status));
       if (response.isSuccess) {
         showSnackBarMessage(context, "Task Update", true);
-        completedTaskListModel?.taskList?.removeAt(index);
+        _completedTaskListController.taskListModel?.removeAt(index);
         setState(() {});
       } else {
         showSnackBarMessage(context, response.errorMessage, false);

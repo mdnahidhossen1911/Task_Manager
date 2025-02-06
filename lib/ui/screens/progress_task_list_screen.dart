@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:task_manager/ui/controller/progress_task_list_controller.dart';
 
-import '../../data/models/task_list_by_status_model.dart';
 import '../../data/services/network_caller.dart';
 import '../../data/utils/urls.dart';
 import '../widgets/background_screen.dart';
@@ -17,8 +18,8 @@ class ProgressTaskListScreen extends StatefulWidget {
 }
 
 class _ProgressTaskListScreenState extends State<ProgressTaskListScreen> {
-  bool _getProgressTaskListInProgress = false;
-  TaskListByStatusModel? progressTaskListModel;
+  final ProgressTaskListController _progressTaskListController =
+      Get.find<ProgressTaskListController>();
 
   @override
   void initState() {
@@ -38,57 +39,56 @@ class _ProgressTaskListScreenState extends State<ProgressTaskListScreen> {
   }
 
   _buildProgressTaskListview() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: Visibility(
-          visible: _getProgressTaskListInProgress == false,
-          replacement: const CenteredCircularProgressIndicator(),
-          child: _buildTaskListView()),
-    );
+    return GetBuilder<ProgressTaskListController>(builder: (controller) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        child: Visibility(
+            visible: controller.inProgress == false,
+            replacement: const CenteredCircularProgressIndicator(),
+            child: _buildTaskListView()),
+      );
+    });
   }
 
   Widget _buildTaskListView() {
-    return ListView.builder(
-      itemCount: progressTaskListModel?.taskList?.length ?? 0,
-      padding: EdgeInsets.symmetric(vertical: 10),
-      itemBuilder: (context, index) {
-        return TaskItemWidget(
-          ontabChangeStatus: (status) {
-            _upgradeStatus(index, status);
-          },
-          ontabDetele: () {
-            _deleteTaskItem(index);
-          },
-          taskModel: progressTaskListModel!.taskList![index],
-        );
-      },
-    );
+    return GetBuilder<ProgressTaskListController>(builder: (controller) {
+      return ListView.builder(
+        itemCount: controller.taskListModel?.length ?? 0,
+        padding: EdgeInsets.symmetric(vertical: 10),
+        itemBuilder: (context, index) {
+          return TaskItemWidget(
+            ontabChangeStatus: (status) {
+              _upgradeStatus(index, status);
+            },
+            ontabDetele: () {
+              _deleteTaskItem(index);
+            },
+            taskModel: controller.taskListModel![index],
+          );
+        },
+      );
+    });
   }
 
   Future<void> _getProgressTaskList() async {
-    _getProgressTaskListInProgress = true;
-    setState(() {});
-    final NetworkResponse response = await NetworkCaller.getRequest(
-        url: Urls.taskListByStatusUrl('Progress'));
-    if (response.isSuccess) {
-      progressTaskListModel =
-          TaskListByStatusModel.fromJson(response.responseData!);
-    } else {
-      showSnackBarMessage(context, response.errorMessage, false);
+    bool isSuccess = await _progressTaskListController.getList();
+
+    if (isSuccess == false) {
+      showSnackBarMessage(
+          context, _progressTaskListController.errormassege, false);
     }
-    _getProgressTaskListInProgress = false;
-    setState(() {});
   }
 
   Future<void> _deleteTaskItem(int index) async {
-    final String? _taskId = progressTaskListModel!.taskList![index].sId;
+    final String? _taskId =
+        _progressTaskListController.taskListModel![index].sId;
     showSnackBarMessage(context, "Deleting....", true);
 
     NetworkResponse response =
         await NetworkCaller.getRequest(url: Urls.deleteTask(_taskId!));
     if (response.isSuccess) {
       showSnackBarMessage(context, "Task Deleted", true);
-      progressTaskListModel?.taskList?.removeAt(index);
+      _progressTaskListController.taskListModel?.removeAt(index);
       setState(() {});
     } else {
       showSnackBarMessage(context, response.errorMessage, false);
@@ -100,13 +100,14 @@ class _ProgressTaskListScreenState extends State<ProgressTaskListScreen> {
       showSnackBarMessage(context, "You are in 'Progress status'.", false);
     } else {
       showSnackBarMessage(context, "status updating.....", true);
-      final String? _taskId = progressTaskListModel!.taskList![index].sId;
+      final String? _taskId =
+          _progressTaskListController.taskListModel![index].sId;
 
       NetworkResponse response = await NetworkCaller.getRequest(
           url: Urls.UpgradeTask(_taskId!, status));
       if (response.isSuccess) {
         showSnackBarMessage(context, "Task Update", true);
-        progressTaskListModel?.taskList?.removeAt(index);
+        _progressTaskListController.taskListModel!.removeAt(index);
         setState(() {});
       } else {
         showSnackBarMessage(context, response.errorMessage, false);

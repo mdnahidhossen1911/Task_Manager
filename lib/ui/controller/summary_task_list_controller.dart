@@ -52,6 +52,7 @@ class SummaryTaskListController extends GetxController {
       isSuccess = false;
       _errorMessage = response.errorMessage;
     }
+    update();
     return isSuccess;
   }
 }
