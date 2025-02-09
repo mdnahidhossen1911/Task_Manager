@@ -5,6 +5,7 @@ import 'package:task_manager/ui/controller/progress_task_list_controller.dart';
 import 'package:task_manager/ui/controller/recovary_password_controller.dart';
 import 'package:task_manager/ui/controller/sign_in_controller.dart';
 import 'package:task_manager/ui/controller/summary_task_list_controller.dart';
+import 'package:task_manager/ui/controller/task_delete_controller.dart';
 
 import 'ui/controller/auth_controller.dart';
 import 'ui/controller/cancel_task_list_controller.dart';
@@ -20,6 +21,7 @@ class ControllBinder extends Bindings {
     Get.lazyPut(() => ForgotPasswordGmailController());
     Get.lazyPut(() => ForgotPasswordOtpController());
     Get.lazyPut(() => RecovaryPasswordController());
+    Get.lazyPut(() => TaskDeleteController());
 
     Get.put(NewTaskListController());
     Get.put(CompleteTaskListController());

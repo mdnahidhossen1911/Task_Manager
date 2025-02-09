@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:task_manager/ui/controller/progress_task_list_controller.dart';
+import 'package:task_manager/ui/controller/task_delete_controller.dart';
 
 import '../../data/services/network_caller.dart';
 import '../../data/utils/urls.dart';
@@ -80,18 +81,19 @@ class _ProgressTaskListScreenState extends State<ProgressTaskListScreen> {
   }
 
   Future<void> _deleteTaskItem(int index) async {
-    final String? _taskId =
+    final String? taskId =
         _progressTaskListController.taskListModel![index].sId;
+
     showSnackBarMessage(context, "Deleting....", true);
 
-    NetworkResponse response =
-        await NetworkCaller.getRequest(url: Urls.deleteTask(_taskId!));
-    if (response.isSuccess) {
+    TaskDeleteController deleteController = Get.find<TaskDeleteController>();
+    bool isSuccess = await deleteController.deleted(taskId!);
+
+    if (isSuccess) {
       showSnackBarMessage(context, "Task Deleted", true);
-      _progressTaskListController.taskListModel?.removeAt(index);
-      setState(() {});
+      _progressTaskListController.deleteItem(index);
     } else {
-      showSnackBarMessage(context, response.errorMessage, false);
+      showSnackBarMessage(context, deleteController.errorMassege, false);
     }
   }
 

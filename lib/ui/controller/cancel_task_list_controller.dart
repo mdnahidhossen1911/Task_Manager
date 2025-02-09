@@ -36,4 +36,9 @@ class CancelTaskListController extends GetxController {
     update();
     return isSuccess;
   }
+
+  void deleteItem(int index) {
+    taskListModel?.removeAt(index);
+    update();
+  }
 }

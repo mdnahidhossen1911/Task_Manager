@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:task_manager/ui/controller/cancel_task_list_controller.dart';
+import 'package:task_manager/ui/controller/task_delete_controller.dart';
 
 import '../../data/services/network_caller.dart';
 import '../../data/utils/urls.dart';
@@ -79,17 +80,17 @@ class _CanceledTaskListScreenState extends State<CanceledTaskListScreen> {
   }
 
   Future<void> _deleteTaskItem(int index) async {
-    final String? _taskId = _cancelTaskListController.taskListModel![index].sId;
+    final String? taskId = _cancelTaskListController.taskListModel![index].sId;
     showSnackBarMessage(context, "Deleting....", true);
 
-    NetworkResponse response =
-        await NetworkCaller.getRequest(url: Urls.deleteTask(_taskId!));
-    if (response.isSuccess) {
+    TaskDeleteController deleteController = Get.find<TaskDeleteController>();
+    bool isSuccess = await deleteController.deleted(taskId!);
+
+    if (isSuccess) {
       showSnackBarMessage(context, "Task Deleted", true);
-      _cancelTaskListController.taskListModel!.removeAt(index);
-      setState(() {});
+      _cancelTaskListController.deleteItem(index);
     } else {
-      showSnackBarMessage(context, response.errorMessage, false);
+      showSnackBarMessage(context, deleteController.errorMassege, false);
     }
   }
 

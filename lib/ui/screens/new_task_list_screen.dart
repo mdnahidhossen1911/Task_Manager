@@ -4,6 +4,7 @@ import 'package:get/get_instance/get_instance.dart';
 import 'package:get/get_navigation/get_navigation.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:task_manager/ui/controller/new_task_list_controller.dart';
+import 'package:task_manager/ui/controller/task_delete_controller.dart';
 
 import '../../data/models/task_count_model.dart';
 import '../../data/services/network_caller.dart';
@@ -135,7 +136,7 @@ class _NewTaskListScreenState extends State<NewTaskListScreen> {
   Future<void> _getTaskCountByStatus() async {
     bool isSuccess = await _summaryTaskListController.summaryApiCall();
     if (isSuccess) {
-      if (_summaryTaskListController.StatusModel!.length != 0) {
+      if (_summaryTaskListController.StatusModel!.isNotEmpty) {
         _getNewTaskList();
       }
     } else {
@@ -152,15 +153,15 @@ class _NewTaskListScreenState extends State<NewTaskListScreen> {
   }
 
   Future<void> _deleteTaskItem(int index) async {
-    final String? _taskId = _newTaskListController!.taskListModel![index].sId;
+    final String? taskId = _newTaskListController.taskListModel![index].sId;
     showSnackBarMessage(context, "Deleting....", true);
 
-    NetworkResponse response =
-        await NetworkCaller.getRequest(url: Urls.deleteTask(_taskId!));
-    if (response.isSuccess) {
-      showSnackBarMessage(context, "Task Deleted", true);
-      _newTaskListController.taskListModel?.removeAt(index);
+    TaskDeleteController deleteController = Get.find<TaskDeleteController>();
+    bool isSuccess = await deleteController.deleted(taskId!);
 
+    if (isSuccess) {
+      showSnackBarMessage(context, "Task Deleted", true);
+      _newTaskListController.deleteItem(index);
       // again reload summary list
       bool isSuccsee =
           await _summaryTaskListController.summaryApiCallWithOutProgress();
@@ -169,22 +170,22 @@ class _NewTaskListScreenState extends State<NewTaskListScreen> {
             context, _summaryTaskListController.errorMessage, false);
       }
     } else {
-      showSnackBarMessage(context, response.errorMessage, false);
+      showSnackBarMessage(context, deleteController.errorMassege, false);
     }
   }
 
   Future<void> _upgradeStatus(int index, String status) async {
-    final String? _taskId = _newTaskListController!.taskListModel![index].sId;
+    final String? taskId = _newTaskListController!.taskListModel![index].sId;
 
     if (status == "New") {
       showSnackBarMessage(context, "You are in 'New status'.", false);
     } else {
       showSnackBarMessage(context, "status updating.....", true);
       NetworkResponse response = await NetworkCaller.getRequest(
-          url: Urls.UpgradeTask(_taskId!, status));
+          url: Urls.UpgradeTask(taskId!, status));
       if (response.isSuccess) {
         showSnackBarMessage(context, "Task Update", true);
-        _newTaskListController?.taskListModel?.removeAt(index);
+        _newTaskListController.taskListModel?.removeAt(index);
         // again reload summary list
         bool isSuccsee =
             await _summaryTaskListController.summaryApiCallWithOutProgress();
