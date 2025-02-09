@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:task_manager/ui/controller/cancel_task_list_controller.dart';
 import 'package:task_manager/ui/controller/task_delete_controller.dart';
+import 'package:task_manager/ui/controller/task_udate_controller.dart';
+import 'package:task_manager/ui/utils/status.dart';
 
-import '../../data/services/network_caller.dart';
-import '../../data/utils/urls.dart';
 import '../widgets/background_screen.dart';
 import '../widgets/centered_circular_progress_indicator.dart';
 import '../widgets/snack_bar_massage.dart';
@@ -95,21 +95,19 @@ class _CanceledTaskListScreenState extends State<CanceledTaskListScreen> {
   }
 
   Future<void> _upgradeStatus(int index, String status) async {
-    if (status == "Cancel") {
+    final String? taskId = _cancelTaskListController.taskListModel![index].sId;
+
+    if (status == Status.Cancel) {
       showSnackBarMessage(context, "You are in 'Cancel status'.", false);
     } else {
       showSnackBarMessage(context, "status updating.....", true);
-      final String? _taskId =
-          _cancelTaskListController.taskListModel![index].sId;
-
-      NetworkResponse response = await NetworkCaller.getRequest(
-          url: Urls.UpgradeTask(_taskId!, status));
-      if (response.isSuccess) {
+      TaskUdateController taskUdateController = Get.find<TaskUdateController>();
+      bool isSuccess = await taskUdateController.uppdate(taskId!, status);
+      if (isSuccess) {
         showSnackBarMessage(context, "Task Update", true);
-        _cancelTaskListController.taskListModel!.removeAt(index);
-        setState(() {});
+        _cancelTaskListController.deleteItem(index);
       } else {
-        showSnackBarMessage(context, response.errorMessage, false);
+        showSnackBarMessage(context, taskUdateController.errorMassege, false);
       }
     }
   }

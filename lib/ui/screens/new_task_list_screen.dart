@@ -5,10 +5,10 @@ import 'package:get/get_navigation/get_navigation.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:task_manager/ui/controller/new_task_list_controller.dart';
 import 'package:task_manager/ui/controller/task_delete_controller.dart';
+import 'package:task_manager/ui/controller/task_udate_controller.dart';
+import 'package:task_manager/ui/utils/status.dart';
 
 import '../../data/models/task_count_model.dart';
-import '../../data/services/network_caller.dart';
-import '../../data/utils/urls.dart';
 import '../controller/summary_task_list_controller.dart';
 import '../utils/app_colors.dart';
 import '../widgets/background_screen.dart';
@@ -60,7 +60,6 @@ class _NewTaskListScreenState extends State<NewTaskListScreen> {
             (value) {
               if (value == true) {
                 _getTaskCountByStatus();
-                print(value);
               }
             },
           );
@@ -175,26 +174,23 @@ class _NewTaskListScreenState extends State<NewTaskListScreen> {
   }
 
   Future<void> _upgradeStatus(int index, String status) async {
-    final String? taskId = _newTaskListController!.taskListModel![index].sId;
+    final String? taskId = _newTaskListController.taskListModel![index].sId;
 
-    if (status == "New") {
+    if (status == Status.New) {
       showSnackBarMessage(context, "You are in 'New status'.", false);
     } else {
       showSnackBarMessage(context, "status updating.....", true);
-      NetworkResponse response = await NetworkCaller.getRequest(
-          url: Urls.UpgradeTask(taskId!, status));
-      if (response.isSuccess) {
+
+      TaskUdateController taskUdateController = Get.find<TaskUdateController>();
+      bool isSuccess = await taskUdateController.uppdate(taskId!, status);
+
+      if (isSuccess) {
         showSnackBarMessage(context, "Task Update", true);
-        _newTaskListController.taskListModel?.removeAt(index);
+        _newTaskListController.deleteItem(index);
         // again reload summary list
-        bool isSuccsee =
-            await _summaryTaskListController.summaryApiCallWithOutProgress();
-        if (isSuccsee == false) {
-          showSnackBarMessage(
-              context, _summaryTaskListController.errorMessage, false);
-        }
+        await _summaryTaskListController.summaryApiCallWithOutProgress();
       } else {
-        showSnackBarMessage(context, response.errorMessage, false);
+        showSnackBarMessage(context, taskUdateController.errorMassege, false);
       }
     }
   }

@@ -4,9 +4,9 @@ import 'package:get/get_instance/get_instance.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:task_manager/ui/controller/complete_task_list_controller.dart';
 import 'package:task_manager/ui/controller/task_delete_controller.dart';
+import 'package:task_manager/ui/controller/task_udate_controller.dart';
+import 'package:task_manager/ui/utils/status.dart';
 
-import '../../data/services/network_caller.dart';
-import '../../data/utils/urls.dart';
 import '../widgets/background_screen.dart';
 import '../widgets/centered_circular_progress_indicator.dart';
 import '../widgets/snack_bar_massage.dart';
@@ -103,21 +103,22 @@ class _CompletedTaskListScreenState extends State<CompletedTaskListScreen> {
   }
 
   Future<void> _upgradeStatus(int index, String status) async {
-    if (status == "Complete") {
+    final String? taskId =
+        _completedTaskListController.taskListModel![index].sId;
+
+    if (status == Status.Complete) {
       showSnackBarMessage(context, "You are in 'Complete status'.", false);
     } else {
       showSnackBarMessage(context, "status updating.....", true);
-      final String? _taskId =
-          _completedTaskListController.taskListModel?[index].sId;
 
-      NetworkResponse response = await NetworkCaller.getRequest(
-          url: Urls.UpgradeTask(_taskId!, status));
-      if (response.isSuccess) {
+      TaskUdateController taskUdateController = Get.find<TaskUdateController>();
+      bool isSuccess = await taskUdateController.uppdate(taskId!, status);
+
+      if (isSuccess) {
         showSnackBarMessage(context, "Task Update", true);
-        _completedTaskListController.taskListModel?.removeAt(index);
-        setState(() {});
+        _completedTaskListController.deleteItem(index);
       } else {
-        showSnackBarMessage(context, response.errorMessage, false);
+        showSnackBarMessage(context, taskUdateController.errorMassege, false);
       }
     }
   }
