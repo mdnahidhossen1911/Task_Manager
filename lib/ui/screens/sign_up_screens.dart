@@ -200,7 +200,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
         showSnackBarMessage(context, _signUpController.errorMessage!, false);
       }
     }
-    setState(() {});
   }
 
   Future<void> _signIn() async {

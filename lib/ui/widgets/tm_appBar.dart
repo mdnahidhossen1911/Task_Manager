@@ -82,8 +82,7 @@ class TMAppBar extends StatelessWidget implements PreferredSizeWidget {
               ),
               onTap: () async {
                 await AuthController.clearUserData();
-                Navigator.pushNamedAndRemoveUntil(
-                    context, SignInScreen.name, (predicate) => false);
+                Get.offAllNamed(SignInScreen.name);
               },
             ),
           ],

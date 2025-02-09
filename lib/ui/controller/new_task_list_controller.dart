@@ -41,4 +41,9 @@ class NewTaskListController extends GetxController {
     taskListModel?.removeAt(index);
     update();
   }
+
+  void listClear() {
+    _taskListByStatusModel?.taskList!.clear();
+    update();
+  }
 }

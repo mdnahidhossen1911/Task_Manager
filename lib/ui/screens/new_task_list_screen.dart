@@ -36,6 +36,7 @@ class _NewTaskListScreenState extends State<NewTaskListScreen> {
   @override
   void initState() {
     super.initState();
+    _newTaskListController.listClear();
     _getTaskCountByStatus();
   }
 
