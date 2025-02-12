@@ -82,6 +82,7 @@ class TaskManagerApp extends StatelessWidget {
         ),
         appBarTheme: AppBarTheme(
           iconTheme: IconThemeData(color: Colors.white),
+          actionsIconTheme: IconThemeData(color: Colors.black),
         ),
       ),
       initialRoute: '/',
