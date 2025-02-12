@@ -36,7 +36,6 @@ class _NewTaskListScreenState extends State<NewTaskListScreen> {
   @override
   void initState() {
     super.initState();
-    _newTaskListController.listClear();
     _getTaskCountByStatus();
   }
 
@@ -194,5 +193,11 @@ class _NewTaskListScreenState extends State<NewTaskListScreen> {
         showSnackBarMessage(context, taskUdateController.errorMassege, false);
       }
     }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _newTaskListController.listClear();
   }
 }

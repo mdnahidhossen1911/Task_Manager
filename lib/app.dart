@@ -80,6 +80,9 @@ class TaskManagerApp extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
           ),
         ),
+        appBarTheme: AppBarTheme(
+          iconTheme: IconThemeData(color: Colors.white),
+        ),
       ),
       initialRoute: '/',
       onGenerateRoute: (settings) {
