@@ -1,8 +1,6 @@
 # Task Manager App 📅✅
 A powerful Task Manager App built with Flutter, using GetX for state management and SharedPreferences for local storage. Easily create, update, delete, and filter tasks by status (New, In Progress, Completed, Canceled).
 
-Download:
-https://github.com/mdnahidhossen1911/Task_Manager/releases/tag/task_manager
 
 ✨ Features:
 - User Authentication (Login, Registration)
